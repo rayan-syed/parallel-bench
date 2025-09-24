@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/wgpu.dir/src/main.cpp.o CMakeFiles/wgpu.dir/src/webgpu_utils.cpp.o CMakeFiles/wgpu.dir/src/mult/mult.cpp.o -o wgpu   -L/projectnb/batmanlab/rsyed/Mirai/thing/parallel-bench/wgpu/webgpu/bin/linux-x86_64  -Wl,-rpath,/projectnb/batmanlab/rsyed/Mirai/thing/parallel-bench/wgpu/webgpu/bin/linux-x86_64 -lwgpu_native 
