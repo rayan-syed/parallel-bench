@@ -78,7 +78,7 @@ void mult(
 
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/mult/mult.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("wgpu/src/mult/mult.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BIND GROUP AND LAYOUT

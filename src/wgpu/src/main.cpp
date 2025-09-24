@@ -4,18 +4,28 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
+#include <execution>
+#include <cstdlib>
 #include "webgpu_utils.h"
 #include "mult/mult.h"
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        cerr << "Usage: " << argv[0] << " <N>" << endl;
+        return 1;
+    }
+    
+    int N = atoi(argv[1]);
+    if (N <= 0) {
+        cerr << "N must be positive" << endl;
+        return 1;
+    }
+
     // init wgpu
     WebGPUContext context;
     initWebGPU(context);
-
-    // input vectors
-    const int N = 10000000;
     mt19937 gen(random_device{}());
     uniform_real_distribution<> dist(0, 100);
     vector<float> A(N), B(N);
@@ -39,24 +49,10 @@ int main() {
     }
     duration /= runs;
 
-    cout << "Average time elapsed with wgpu: " << duration << endl;
+    cout << duration << endl; // print avg duration 
 
     ABuffer.release();
     BBuffer.release();
     outputBuffer.release();
-
-    // transform
-    vector<float> out(N);
-    runs = 10;
-    duration = 0;
-    for(int i = 0; i<runs; i++) {
-        auto start = chrono::high_resolution_clock::now();
-        transform(A.begin(), A.end(), B.begin(), out.begin(), [](float x, float y) { return x * y; });
-        auto end = chrono::high_resolution_clock::now();
-        duration += chrono::duration_cast<chrono::milliseconds>(end - start).count();
-    }
-    duration /= runs;
-
-    cout << "Average time elapsed with transform: " << duration << endl;
     return 0;
 }
