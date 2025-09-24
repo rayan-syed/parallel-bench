@@ -40,18 +40,20 @@ int main(int argc, char* argv[]) {
     // output buffer
     wgpu::Buffer outputBuffer = createBuffer(context.device, nullptr, sizeof(float) * N, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
 
-    // multiply and track durations
+    // warmup
+    mult(context, outputBuffer, ABuffer, BBuffer, 100);
+
+    // benchmark
     int runs = 10;
-    int duration = 0;
-    for(int i = 0; i<runs; i++) {
+    long total_ms = 0;
+    for(int r = 0; r < runs; r++) {
         auto start = chrono::high_resolution_clock::now();
         mult(context, outputBuffer, ABuffer, BBuffer, N);
         auto end = chrono::high_resolution_clock::now();
-        duration += chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        total_ms += chrono::duration_cast<chrono::milliseconds>(end - start).count();
     }
-    duration /= runs;
-
-    cout << duration << endl; // print avg duration 
+    long avg_ms = total_ms / runs;
+    cout << avg_ms << endl; 
 
     ABuffer.release();
     BBuffer.release();

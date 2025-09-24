@@ -2,24 +2,21 @@ import subprocess
 import os
 from src.build import build_project
 
-class WGPURunner:
+class OMPRunner:
     """
-    Runner for the WebGPU benchmark binary.
+    Runner for the OpenMP benchmark binary.
     """
 
-    def __init__(self, project_dir="src/wgpu", exe_name="wgpu"):
+    def __init__(self, project_dir="src/omp", exe_name="omp_bench"):
         self.project_dir = os.path.abspath(project_dir)
-        self.exe_name = exe_name
         self.exe_path = os.path.join(self.project_dir, "build", exe_name)
 
     def build(self):
-        """Build the WGPU C++ project."""
-        print("[WGPU] Building...")
+        print("[OMP] Building...")
         build_project(self.project_dir)
-        print("[WGPU] Build complete.")
+        print("[OMP] Build complete.")
 
     def run(self, N: int) -> int:
-        """Run WGPU binary with N and return avg time in ms."""
         result = subprocess.run(
             [self.exe_path, str(N)],
             capture_output=True,
