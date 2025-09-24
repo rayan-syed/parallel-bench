@@ -26,6 +26,8 @@ int main(int argc, char* argv[]) {
     // init wgpu
     WebGPUContext context;
     initWebGPU(context);
+
+    // generate input vectors
     mt19937 gen(random_device{}());
     uniform_real_distribution<> dist(0, 100);
     vector<float> A(N), B(N);
