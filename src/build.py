@@ -1,12 +1,12 @@
 import subprocess
 import os
 
-def build_project(project_dir: str) -> str:
+def build_project(project_dir, build_dir="build") -> str:
     """
     Configure and build a CMake project.
     Returns path to the build directory.
     """
-    build_dir = os.path.join(project_dir, "build")
+    build_dir = os.path.join(project_dir, build_dir)
     os.makedirs(build_dir, exist_ok=True)
 
     subprocess.run(

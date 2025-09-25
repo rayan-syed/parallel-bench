@@ -5,24 +5,30 @@ Runs benchmarks across frameworks and saves results.
 
 from src.runners.wgpu_runner import WGPURunner
 from src.runners.omp_runner import OMPRunner
+import time
 
 def main():
     sizes = [1_000_000, 5_000_000, 10_000_000]
 
-    wgpu = WGPURunner()
+    llvmpipe = WGPURunner(backend="llvmpipe")
+    swiftshader = WGPURunner(backend="swiftshader")
     omp = OMPRunner()
 
-    wgpu.build()
+    llvmpipe.build()
+    swiftshader.build()
     omp.build()
 
     # header
-    print(f"{'N':>12} | {'WGPU (ms)':>10} | {'OpenMP (ms)':>11}")
-    print("-" * 39)
+    print(f"{'N':>12} | {'LLVMPipe (ms)':>15} | {'SwiftShader (ms)':>15} | {'OpenMP (ms)':>15}")
+    print("-" * (12 + 3 + 15 + 3 + 15 + 3 + 15))
 
     for N in sizes:
-        wgpu_ms = wgpu.run(N)
+        llvmpipe_ms = llvmpipe.run(N)
+        time.sleep(1)
+        swiftshader_ms = swiftshader.run(N)
+        time.sleep(1)
         omp_ms  = omp.run(N)
-        print(f"{N:>12,d} | {wgpu_ms:>10} | {omp_ms:>11}")
+        print(f"{N:>12,d} | {llvmpipe_ms:>15} | {swiftshader_ms:>15} | {omp_ms:>15}")
 
 if __name__ == "__main__":
     main()
