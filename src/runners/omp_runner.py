@@ -16,11 +16,13 @@ class OMPRunner:
         build_project(self.project_dir)
         print("[OMP] Build complete.")
 
-    def run(self, N: int) -> int:
+    def run(self, N: int, shader_type: int):
+        """Run OMP binary with N and return avg time in ms."""
         result = subprocess.run(
-            [self.exe_path, str(N)],
+            [self.exe_path, str(N), str(shader_type)],
             capture_output=True,
             text=True,
             check=True
         )
-        return int(result.stdout.strip())
+        parts = result.stdout.strip().split()
+        return tuple(int(x) for x in parts)  # (exec_ms, overhead_ms, total_ms)
