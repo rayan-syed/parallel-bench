@@ -24,14 +24,13 @@ def plot_lines(df, ycol, title_suffix, out_path):
     plt.savefig(out_path, dpi=200)
     plt.close()
 
-
 def plot_stacked(df, shader_type, out_path):
     sub = df[df["ShaderType"] == shader_type]
     backends = sub["Backend"].unique()
     Ns = sorted(sub["N"].unique())
 
     bar_width = 0.25
-    offsets = [(i - len(backends)/2) * bar_width for i in range(len(backends))]
+    offsets = [(i - len(backends) / 2) * bar_width for i in range(len(backends))]
 
     plt.figure(figsize=(8, 5))
     for offset, backend in zip(offsets, backends):
@@ -42,14 +41,14 @@ def plot_stacked(df, shader_type, out_path):
             x_positions,
             d["ExecMs"],
             width=bar_width,
-            label=f"{backend} Exec"
+            label=f"{backend} Exec",
         )
         plt.bar(
             x_positions,
             d["OverheadMs"],
             bottom=d["ExecMs"],
             width=bar_width,
-            label=f"{backend} Overhead"
+            label=f"{backend} Overhead",
         )
 
     plt.xticks(range(len(Ns)), [f"{n:,}" for n in Ns])
@@ -61,60 +60,63 @@ def plot_stacked(df, shader_type, out_path):
     plt.savefig(out_path, dpi=200)
     plt.close()
 
+def run_experiment(sizes, backends, outdir):
+    results = []
+
+    for label, stype in [("simple", 0), ("complex", 1)]:
+        print(f"Running {label} experiments ({outdir})...")
+        for N in tqdm(sizes, desc=f"{label} experiments"):
+            for backend, runner in backends:
+                exec_ms, over_ms, tot_ms = runner.run(N, shader_type=stype)
+                results.append(
+                    {
+                        "N": N,
+                        "ShaderType": label,
+                        "Backend": backend,
+                        "ExecMs": exec_ms,
+                        "OverheadMs": over_ms,
+                        "TotalMs": tot_ms,
+                    }
+                )
+
+    # save csv + plots
+    os.makedirs(outdir, exist_ok=True)
+    df = pd.DataFrame(results)
+    csv_path = os.path.join(outdir, "bench.csv")
+    df.to_csv(csv_path, index=False)
+    print(f"Saved results to {csv_path}")
+
+    for shader_type in df["ShaderType"].unique():
+        sub = df[df["ShaderType"] == shader_type]
+
+        plot_lines(
+            sub, "TotalMs", f"{shader_type} — Total time", os.path.join(outdir, f"bench_{shader_type}_total.png")
+        )
+        plot_stacked(
+            sub, shader_type, os.path.join(outdir, f"bench_{shader_type}_stacked.png")
+        )
+        print(f"Saved plots for {shader_type} in {outdir}")
 
 def main():
-    # input sizes to test
-    sizes = [1_000_000]
-
-    # central list of backends/runners
-    backends = [
+    # small-scale tests (with omp)
+    small_sizes = [1_000, 10_000, 50_000, 100_000]
+    small_backends = [
         ("llvmpipe", WGPURunner(backend="llvmpipe")),
         ("swiftshader", WGPURunner(backend="swiftshader")),
         ("omp", OMPRunner()),
     ]
-
-    # Build all
-    for _, runner in backends:
+    # rebuild all once
+    for _, runner in small_backends:
         runner.build()
+    run_experiment(small_sizes, small_backends, "results/small")
 
-    results = []
-
-    for shader_type in [("simple", 0), ("complex", 1)]:
-        label, stype = shader_type
-        print(f"Running {label} experiments...")
-        for N in tqdm(sizes, desc=f"{label} experiments"):
-            for backend, runner in backends:
-                exec_ms, over_ms, tot_ms = runner.run(N, shader_type=stype)
-                results.append({
-                    "N": N,
-                    "ShaderType": label,
-                    "Backend": backend,
-                    "ExecMs": exec_ms,
-                    "OverheadMs": over_ms,
-                    "TotalMs": tot_ms
-                })
-
-    # Save CSV
-    os.makedirs("results", exist_ok=True)
-    df = pd.DataFrame(results)
-    csv_path = "results/bench.csv"
-    df.to_csv(csv_path, index=False)
-    print(f"Saved results to {csv_path}")
-
-    # Plot
-    for shader_type in df["ShaderType"].unique():
-        sub = df[df["ShaderType"] == shader_type]
-
-        plot_lines(sub, "TotalMs",
-                   f"{shader_type} — Total time",
-                   f"results/bench_{shader_type}_total.png")
-
-        plot_stacked(sub,
-                     shader_type,
-                     f"results/bench_{shader_type}_stacked.png")
-
-        print(f"Saved plots for {shader_type}")
-
+    # large-scale (omit omp)
+    large_sizes = [1_000_000, 3_000_000, 5_000_000, 10_000_000]
+    large_backends = [
+        ("llvmpipe", WGPURunner(backend="llvmpipe")),
+        ("swiftshader", WGPURunner(backend="swiftshader")),
+    ]
+    run_experiment(large_sizes, large_backends, "results/large")
 
 if __name__ == "__main__":
     main()

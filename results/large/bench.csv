@@ -1,0 +1,17 @@
+N,ShaderType,Backend,ExecMs,OverheadMs,TotalMs
+1000000,simple,llvmpipe,1,0,1
+1000000,simple,swiftshader,0,10,10
+3000000,simple,llvmpipe,2,0,2
+3000000,simple,swiftshader,0,9,9
+5000000,simple,llvmpipe,5,0,5
+5000000,simple,swiftshader,0,15,15
+10000000,simple,llvmpipe,12,0,12
+10000000,simple,swiftshader,0,16,16
+1000000,complex,llvmpipe,1105,1,1106
+1000000,complex,swiftshader,0,37,37
+3000000,complex,llvmpipe,3329,3,3332
+3000000,complex,swiftshader,0,44,44
+5000000,complex,llvmpipe,5668,2,5670
+5000000,complex,swiftshader,0,44,44
+10000000,complex,llvmpipe,10821,5,10826
+10000000,complex,swiftshader,0,31,31
