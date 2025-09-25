@@ -1,7 +1,12 @@
 # Benchmarking Parallel Processing Approaches on CPUs
 
-The goal of this repo is to explore different parallel processing approaches on CPUs and understand their pros/cons.
+This repository benchmarks different approaches to parallel processing on CPUs and examines their trade-offs.
 
 ## Motivation
 
-There are many ways to run multi-threaded processes on CPUs. Through recent other proejcts I've found that even GPU-focused software can be run on CPUs via simulation (ex. WebGPU). I was curious as to the difference in the runtimes of something like that vs. something built for CPU parallel processing (ex. FastFlow, OpenMP). I believe WebGPU utilizes SwiftShader in its backend as well so any benchmarking on WebGPU here will probably be replaced with SwiftShader soon.
+There are many ways to exploit CPU parallelism. Traditional CPU-native frameworks (e.g. OpenMP, FastFlow) give explicit control over threads and scheduling. At the same time, GPU-oriented APIs such as WebGPU can still run on CPUs by using software rasterizers like llvmpipe (from Mesa) or SwiftShader (from Google). To experiment with GPU code on CPUs, WebGPU is used to change the runtimes.
+
+The goal is not only to measure raw performance but also to understand the trade-offs:
+- How do GPU-style runtimes (WebGPU + SwiftShader/llvmpipe) behave when emulated on CPUs?
+- How close can they get to optimized CPU-native frameworks?
+- What are the overheads and benefits of using a GPU-first programming model on a CPU?
