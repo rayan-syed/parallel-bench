@@ -67,7 +67,7 @@ Results are aggregated into CSVs and plotted in `results/` folder.
   - As a result, overhead becomes trivial when compared to its gains on heavy compute workloads.  
  
 ## Additional Find
-While **SwiftShader** is expectedly dominant here, it does have a major downside. Workgroup size is capped at 256 on CPU, limiting its scaling behavior significantly. This can be seen within the source code from the SwiftShader codebase:
+While **SwiftShader** is expectedly dominant here, it does have a major downside. Workgroup size is capped at 256 on CPU, limiting its scaling behavior significantly. LLVMpipe, on the other hand, scales with the device the same way typical GPU drivers would allow. This downside can be seen within the source code from the SwiftShader codebase:
 ```
 { 256, 256, 64 },                            // maxComputeWorkGroupSize[3]
 ```
