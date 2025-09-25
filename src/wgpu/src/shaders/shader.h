@@ -13,7 +13,8 @@ long shader(
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer1, 
     wgpu::Buffer& inputBuffer2,
-    size_t bufferlen
+    size_t bufferlen,
+    bool simple = false
 );
 
 #endif 

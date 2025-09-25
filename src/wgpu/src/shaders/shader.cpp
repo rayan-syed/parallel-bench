@@ -68,7 +68,8 @@ long shader(
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer1, 
     wgpu::Buffer& inputBuffer2,
-    size_t bufferlen
+    size_t bufferlen,
+    bool simple
 ) {
     buffer_len = bufferlen;
 
@@ -78,7 +79,8 @@ long shader(
 
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/wgpu/src/shaders/simple_shader.wgsl", limits.maxWorkgroupSizeX);
+    std::string shader_file = simple==0 ? "src/wgpu/src/shaders/simple_shader.wgsl" : "src/wgpu/src/shaders/complex_shader.wgsl";
+    std::string shaderCode = readShaderFile(shader_file, limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BIND GROUP AND LAYOUT

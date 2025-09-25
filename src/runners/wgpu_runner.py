@@ -28,16 +28,17 @@ class WGPURunner:
         build_project(self.project_dir, self.build_dir)
         print(f"[WGPU] Build complete.")
 
-    def run(self, N: int) -> int:
+    def run(self, N: int, shader_type: int) -> int:
         """Run WGPU binary with N and return avg time in ms."""
         env = os.environ.copy()
         if self.icd:
             env["VK_ICD_FILENAMES"] = self.icd
         result = subprocess.run(
-            [self.exe_path, str(N)],
+            [self.exe_path, str(N), str(shader_type)],
             capture_output=True,
             text=True,
             check=True,
             env=env
         )
-        return int(result.stdout.strip())
+        parts = result.stdout.strip().split()
+        return tuple(int(x) for x in parts)

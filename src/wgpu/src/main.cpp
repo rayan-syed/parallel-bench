@@ -12,12 +12,14 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        cerr << "Usage: " << argv[0] << " <N>" << endl;
+    if (argc != 3) {
+        cerr << "Usage: " << argv[0] << " <N> <shaderType>" << endl;
         return 1;
     }
     
     int N = atoi(argv[1]);
+    int shaderType = atoi(argv[2]); // 0 = simple, 1 = complex
+
     if (N <= 0) {
         cerr << "N must be positive" << endl;
         return 1;
@@ -45,13 +47,21 @@ int main(int argc, char* argv[]) {
 
     // benchmark
     int runs = 10;
-    long total_ms = 0;
+    long execution_ms = 0;
+    long overhead_ms = 0;
     for(int r = 0; r < runs; r++) {
-        auto time = shader(context, outputBuffer, ABuffer, BBuffer, N);
-        total_ms += time;
+        auto start = chrono::high_resolution_clock::now();
+        long execution = shader(context, outputBuffer, ABuffer, BBuffer, N, shaderType);
+        auto end = chrono::high_resolution_clock::now();
+        long duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        execution_ms += execution;
+        overhead_ms += (duration - execution);
     }
-    long avg_ms = total_ms / runs;
-    cout << avg_ms << endl; 
+    long avg_execution_ms = execution_ms / runs;
+    long avg_overhead_ms = overhead_ms / runs;
+    long avg_total_ms = avg_execution_ms + avg_overhead_ms;
+
+    cout << avg_execution_ms << " " << avg_overhead_ms << " " << avg_total_ms <<  endl; 
 
     ABuffer.release();
     BBuffer.release();
