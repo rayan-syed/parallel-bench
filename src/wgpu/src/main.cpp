@@ -7,7 +7,7 @@
 #include <execution>
 #include <cstdlib>
 #include "webgpu_utils.h"
-#include "mult/mult.h"
+#include "shaders/shader.h"
 
 using namespace std;
 
@@ -41,16 +41,14 @@ int main(int argc, char* argv[]) {
     wgpu::Buffer outputBuffer = createBuffer(context.device, nullptr, sizeof(float) * N, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
 
     // warmup
-    mult(context, outputBuffer, ABuffer, BBuffer, 100);
+    shader(context, outputBuffer, ABuffer, BBuffer, 100);
 
     // benchmark
     int runs = 10;
     long total_ms = 0;
     for(int r = 0; r < runs; r++) {
-        auto start = chrono::high_resolution_clock::now();
-        mult(context, outputBuffer, ABuffer, BBuffer, N);
-        auto end = chrono::high_resolution_clock::now();
-        total_ms += chrono::duration_cast<chrono::milliseconds>(end - start).count();
+        auto time = shader(context, outputBuffer, ABuffer, BBuffer, N);
+        total_ms += time;
     }
     long avg_ms = total_ms / runs;
     cout << avg_ms << endl; 

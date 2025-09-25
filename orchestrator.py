@@ -8,7 +8,7 @@ from src.runners.omp_runner import OMPRunner
 import time
 
 def main():
-    sizes = [1_000_000, 5_000_000, 10_000_000]
+    sizes = [1_000_000, 10_000_000]
 
     llvmpipe = WGPURunner(backend="llvmpipe")
     swiftshader = WGPURunner(backend="swiftshader")
@@ -24,9 +24,7 @@ def main():
 
     for N in sizes:
         llvmpipe_ms = llvmpipe.run(N)
-        time.sleep(1)
         swiftshader_ms = swiftshader.run(N)
-        time.sleep(1)
         omp_ms  = omp.run(N)
         print(f"{N:>12,d} | {llvmpipe_ms:>15} | {swiftshader_ms:>15} | {omp_ms:>15}")
 

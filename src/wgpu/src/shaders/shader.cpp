@@ -1,4 +1,4 @@
-#include "mult.h"
+#include "shader.h"
 
 static size_t buffer_len;
 
@@ -63,7 +63,7 @@ static wgpu::BindGroup createBindGroup(
     return device.createBindGroup(bindGroupDesc);
 }
 
-void mult(
+long shader(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer1, 
@@ -78,7 +78,7 @@ void mult(
 
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/wgpu/src/mult/mult.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/wgpu/src/shaders/simple_shader.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BIND GROUP AND LAYOUT
@@ -97,7 +97,12 @@ void mult(
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
     uint32_t workgroupsX = std::ceil(double(buffer_len)/limits.maxWorkgroupSizeX);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
+
+    // TIME
+    auto start = std::chrono::high_resolution_clock::now();
     queue.submit(1, &commandBuffer);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
     // RELEASE RESOURCES
     commandBuffer.release();
@@ -105,4 +110,7 @@ void mult(
     bindGroup.release();
     bindGroupLayout.release();
     shaderModule.release();
+
+    // return final time
+    return duration;
 }

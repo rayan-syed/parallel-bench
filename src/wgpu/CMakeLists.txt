@@ -9,7 +9,7 @@ add_executable(
     wgpu
     src/main.cpp
     src/webgpu_utils.cpp
-    src/mult/mult.cpp
+    src/shaders/shader.cpp
 )
 
 set_target_properties(wgpu PROPERTIES
